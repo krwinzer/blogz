@@ -66,5 +66,24 @@ def single_post():
 
     return render_template('single-post.html', title="Single Post", posts=posts)
 
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+
+        if request.method == 'POST':
+            username = request.form['username']
+            password = request.form['password']
+            user = User.query.filter_by(username=username).first()
+            if user and user.password == password:
+                session['username'] = username
+                flash("Logged in")
+                return redirect('/')
+            else:
+                flash("User password incorrect, or user does not exist", 'error')
+
+        return render_template('login.html')
+
+# @app.route('/signup', methods=['GET'])
+# def signup():
+
 if __name__ == '__main__':
     app.run()

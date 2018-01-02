@@ -1,4 +1,4 @@
-from flask import Flask, request, redirect, render_template
+from flask import Flask, request, redirect, render_template, session, flash
 from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
@@ -7,6 +7,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://blogz:blogz2017@localho
 app.config['SQLALCHEMY_ECHO'] = True
 
 db = SQLAlchemy(app)
+app.secret_key = 'pm7yhu8#9thmkrw'
 
 class Blog(db.Model):
 
@@ -23,9 +24,19 @@ class Blog(db.Model):
 class User(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(20))
+    username = db.Column(db.String(20), unique=True)
     password = db.Column(db.String(20))
     blogs = db.relationship('Blog', backref='owner')
+
+    def __init__(self, username, password):
+        self.username = username
+        self.password = password
+
+@app.before_request
+def require_login():
+    allowed_routes = ['login', 'signup']
+    if request.endpoint not in allowed_routes and 'username' not in session:
+        return redirect('/login')
 
 @app.route('/blog', methods = ['POST','GET'])
 def index():
@@ -82,8 +93,67 @@ def login():
 
         return render_template('login.html')
 
-# @app.route('/signup', methods=['GET'])
-# def signup():
+@app.route('/signup', methods=['GET', 'POST'])
+def signup():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        verify = request.form['verify']
+
+    # ------------Blank Fields ---------------
+
+        if len(username) == 0:
+            flash("The username field was left blank.", 'error')
+        else:
+            username = username
+        if len(password) == 0:
+            flash('The password field was left blank.', 'error')
+        else:
+            password = password
+        if len(verify) == 0:
+            flash('The verify password field was left blank.', 'error')
+        else:
+            verify = verify
+
+    # --------Invalid Username, Password, username-------------
+
+        if len(username) != 0:
+            if len(username) < 5 or len(username) > 40 or ' ' in username or '@' not in username or '.' not in username:
+                # if '@' not in username and '.' not in username:
+                flash('username must be between 4 and 20 characters long, cannot contain spaces, and must be in proper username format.', 'error')
+            else:
+                username = username
+
+        if len(password) != 0:
+            if len(password) < 4 or len(password) > 19 or ' ' in password:
+                flash("The password must be between 4 and 19 characters long and cannot contain spaces.", 'error')
+            else:
+                password = password
+
+    # --------Password and Verify Do Not Match----------
+
+        for char, letter in zip(password, verify):
+            if char != letter:
+                flash('Passwords do not match.', 'error')
+            else:
+                verify = verify
+                password = password
+
+        if username and password and verify:
+            existing_user = User.query.filter_by(username=username).first()
+            if not existing_user:
+                new_user = User(username, password)
+                db.session.add(new_user)
+                db.session.commit()
+                session['username'] = username
+                return redirect('/')
+            else:
+                #TODO - user better response messaging
+                return "<h1>Duplicate User</h1>"
+        else:
+            return render_template('signup.html')
+
+    return render_template('signup.html')
 
 if __name__ == '__main__':
     app.run()

@@ -126,26 +126,32 @@ def signup():
     # --------Invalid Username, Password, username-------------
 
         if len(username) != 0:
-            if len(username) < 5 or len(username) > 40 or ' ' in username:
-                # if '@' not in username and '.' not in username:
+            if len(username) < 4 or len(username) > 20 or ' ' in username:
                 flash('username must be between 4 and 20 characters long and cannot contain spaces.', 'error')
+                return render_template('/signup.html')
             else:
                 username = username
 
         if len(password) != 0:
-            if len(password) < 4 or len(password) > 19 or ' ' in password:
+            if len(password) < 4 or len(password) > 20 or ' ' in password:
                 flash("The password must be between 4 and 19 characters long and cannot contain spaces.", 'error')
+                return render_template('/signup.html')
             else:
                 password = password
 
     # --------Password and Verify Do Not Match----------
 
-        for char, letter in zip(password, verify):
-            if char != letter:
-                flash('Passwords do not match.', 'error')
-            else:
-                verify = verify
-                password = password
+        if len(password) == len(verify):
+            for char, letter in zip(password, verify):
+                if char != letter:
+                    flash('Passwords do not match.', 'error')
+                    return render_template('signup.html')
+                else:
+                    verify = verify
+                    password = password
+        else:
+            flash('Passwords do not match.', 'error')
+            return render_template('signup.html')
 
         if username and password and verify:
             existing_user = User.query.filter_by(username=username).first()
@@ -154,10 +160,10 @@ def signup():
                 db.session.add(new_user)
                 db.session.commit()
                 session['username'] = username
-                return redirect('/')
+                return redirect('/new-post')
             else:
                 #TODO - user better response messaging
-                return "<h1>Duplicate User</h1>"
+                flash('Duplicate user.', 'error')
         else:
             return render_template('signup.html')
 

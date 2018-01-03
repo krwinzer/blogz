@@ -126,9 +126,9 @@ def signup():
     # --------Invalid Username, Password, username-------------
 
         if len(username) != 0:
-            if len(username) < 5 or len(username) > 40 or ' ' in username or '@' not in username or '.' not in username:
+            if len(username) < 5 or len(username) > 40 or ' ' in username:
                 # if '@' not in username and '.' not in username:
-                flash('username must be between 4 and 20 characters long, cannot contain spaces, and must be in proper username format.', 'error')
+                flash('username must be between 4 and 20 characters long and cannot contain spaces.', 'error')
             else:
                 username = username
 

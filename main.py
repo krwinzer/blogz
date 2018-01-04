@@ -34,23 +34,15 @@ class User(db.Model):
 
 @app.before_request
 def require_login():
-    allowed_routes = ['blog', 'login', 'signup']
+    allowed_routes = ['blogs_list', 'index', 'login', 'signup', 'single_post']
     if request.endpoint not in allowed_routes and 'username' not in session:
         return redirect('/login')
 
 @app.route('/blog', methods = ['POST','GET'])
-def blogz():
-
-    owner = User.query.filter_by(username=session['username']).first()
-
-    if request.method == 'POST':
-        username = request.form['username']
-        new_user = Blog(username, owner)
-        db.session.add(new_user)
-        db.session.commit()
+def blogs_list():
 
     posts = Blog.query.all()
-    return render_template('blog.html', title="Blogz", posts=posts)
+    return render_template('blog.html', posts=posts)
 
 @app.route('/new-post', methods=['POST', 'GET'])
 def new_post():
@@ -60,15 +52,18 @@ def new_post():
     title_error = ''
     body_error = ''
 
+    owner = User.query.filter_by(username=session['username']).first()
+
     if request.method == 'POST':
         post_title = request.form['post_title']
         post_body = request.form['post_body']
+
         if post_title == '':
             title_error = 'Please enter a Post Title.'
         elif post_body == '':
             body_error = 'Please enter some content.'
         else:
-            new = Blog(post_title, post_body)
+            new = Blog(post_title, post_body, owner)
             db.session.add(new)
             db.session.commit()
 

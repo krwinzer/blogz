@@ -82,9 +82,14 @@ def new_post():
 def single_post():
 
     retrieved_id = request.args.get('id')
-    posts = db.session.query(Blog.post_title, Blog.post_body).filter_by(id=retrieved_id)
+    posts = db.session.query(Blog.post_title, Blog.post_body, Blog.owner_id).filter_by(id=retrieved_id)
 
     return render_template('single-post.html', title="Single Post", posts=posts)
+
+@app.route('/user-posts', methods=['GET'])
+def user_posts():
+
+    return("Hello World!")
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():

@@ -38,8 +38,8 @@ def require_login():
     if request.endpoint not in allowed_routes and 'username' not in session:
         return redirect('/login')
 
-@app.route('/', methods = ['POST','GET'])
-def index():
+@app.route('/blog', methods = ['POST','GET'])
+def blogz():
 
     owner = User.query.filter_by(username=session['username']).first()
 
@@ -168,6 +168,11 @@ def signup():
             return render_template('signup.html')
 
     return render_template('signup.html')
+
+@app.route('/logout')
+def logout():
+    del session['username']
+    return redirect('/blog')
 
 if __name__ == '__main__':
     app.run()

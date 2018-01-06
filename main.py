@@ -34,7 +34,7 @@ class User(db.Model):
 
 @app.before_request
 def require_login():
-    allowed_routes = ['blogs_list', 'index', 'login', 'signup', 'single_post']
+    allowed_routes = ['blogs_list', 'index', 'login', 'signup', 'single_post', 'user_posts']
     if request.endpoint not in allowed_routes and 'username' not in session:
         return redirect('/login')
 
@@ -43,12 +43,6 @@ def index():
 
     authors = User.query.all()
     return render_template('index.html', authors=authors)
-
-@app.route('/blog', methods = ['POST','GET'])
-def blogs_list():
-
-    posts = Blog.query.all()
-    return render_template('blog.html', posts=posts)
 
 @app.route('/new-post', methods=['POST', 'GET'])
 def new_post():
@@ -78,18 +72,29 @@ def new_post():
     return render_template('new-post.html', title="New Post", title_error=title_error,
                 body_error=body_error, post_title=post_title, post_body=post_body)
 
+@app.route('/blog', methods = ['POST','GET'])
+def blogs_list():
+
+    posts = Blog.query.all()
+    users = User.query.all()
+    return render_template('blog.html', posts=posts, users=users)
+
 @app.route('/single-post', methods=['GET'])
 def single_post():
 
     retrieved_id = request.args.get('id')
-    posts = db.session.query(Blog.post_title, Blog.post_body, Blog.owner_id).filter_by(id=retrieved_id)
+    post = Blog.query.get(retrieved_id)
 
-    return render_template('single-post.html', title="Single Post", posts=posts)
+    return render_template('single-post.html', title="Single Post", post=post)
 
 @app.route('/user-posts', methods=['GET'])
 def user_posts():
 
-    return("Hello World!")
+    user_id = request.args.get('id')
+    posts = db.session.query(Blog).filter_by(owner_id=user_id).all()
+    print(len(posts))
+
+    return render_template('user-posts.html', title="User Posts", posts=posts)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():

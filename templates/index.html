@@ -8,7 +8,7 @@
     <p>Nothing to show here</p>
     {% else %}
         {% for author in authors %}
-        <a href=""><h2>{{author.username}}</h2></a>
+        <a href="/user-posts?id={{ author.owner_id }}"><h2>{{author.username}}</h2></a>
         {% endfor %}
     {% endif %}
 

@@ -92,7 +92,6 @@ def user_posts():
 
     user_id = request.args.get('id')
     posts = db.session.query(Blog).filter_by(owner_id=user_id).all()
-    print(len(posts))
 
     return render_template('user-posts.html', title="User Posts", posts=posts)
 

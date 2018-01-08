@@ -25,8 +25,8 @@ class Blog(db.Model):
 class User(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(20), unique=True)
-    pw_hash = db.Column(db.String(20))
+    username = db.Column(db.String(50), unique=True)
+    pw_hash = db.Column(db.String(150))
     blogs = db.relationship('Blog', backref='owner')
 
     def __init__(self, username, password):
@@ -137,14 +137,14 @@ def signup():
     # --------Invalid Username, Password, username-------------
 
         if len(username) != 0:
-            if len(username) < 4 or len(username) > 20 or ' ' in username:
+            if len(username) < 4 or len(username) > 50 or ' ' in username:
                 flash('username must be between 4 and 20 characters long and cannot contain spaces.', 'error')
                 return render_template('/signup.html')
             else:
                 username = username
 
         if len(password) != 0:
-            if len(password) < 4 or len(password) > 20 or ' ' in password:
+            if len(password) < 4 or len(password) > 150 or ' ' in password:
                 flash("The password must be between 4 and 19 characters long and cannot contain spaces.", 'error')
                 return render_template('/signup.html')
             else:

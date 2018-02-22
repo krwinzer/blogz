@@ -4,7 +4,7 @@
 
 {% for post in posts %}
   <h2>{{ post.post_title }}</h2>
-  <h4>Written by {{ post.owner.username }}</a></h4>
+  <h4>Written by <a href="">{{ post.owner.username }}</a></h4>
   <p>{{ post.post_body }}</p>
 {% endfor %}
 

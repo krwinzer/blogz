@@ -3,17 +3,17 @@
 {% block content %}
     <h1>Blogz</h1>
     <h2>Enter a new post:</h2>
-    <form method='post'>
+    <form method="post">
       <label>
         Post Title:
       </label>
-        <input type="text" name="post_title" value={{post_title}}>
+        <input type="text" name="post_title" value="{{post_title}}">
         <p class="error">{{title_error}}</p>
       <br/>
       <label>
         Post:
       </label>
-        <textarea rows="50" cols="120" name="post_body" value={{post_body}}></textarea>
+        <textarea rows="50" cols="120" name="post_body" value="{{post_body}}"></textarea>
         <p class="error">{{body_error}}</p>
         <br/>
         <input type="submit" name="Submit Post" />
